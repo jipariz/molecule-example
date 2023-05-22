@@ -2,36 +2,34 @@ package com.strv.counter.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.strv.counter.data.CounterDataStore
+import app.cash.molecule.AndroidUiDispatcher
+import app.cash.molecule.RecompositionClock
+import app.cash.molecule.launchMolecule
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CounterViewModel @Inject constructor(
-    private val counterDataStore: CounterDataStore
+    private val counterPresenter: CounterPresenter
 ) : ViewModel() {
-    val state: StateFlow<CounterState> = combine(
-        counterDataStore.state,
-        flowOf(Unit),
-    ) { exampleCounter, _ ->
-        CounterState(
-            count = exampleCounter,
-        )
-    }.stateIn(
-        scope = this.viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = CounterState.initial
-    )
+
+    private val moleculeScope = CoroutineScope(viewModelScope.coroutineContext + AndroidUiDispatcher.Main)
+
+    private val moleculeEvents = MutableSharedFlow<CounterEvents>()
+
+    val state: StateFlow<CounterState> = moleculeScope.launchMolecule(clock = RecompositionClock.ContextClock){
+        counterPresenter.Present(events = moleculeEvents)
+    }
 
     fun onCounterButtonClicked() {
         viewModelScope.launch {
-            counterDataStore.incrementCounter()
+            moleculeEvents.emit(CounterEvents.IncrementCounter)
         }
     }
 }
+
+

@@ -4,3 +4,12 @@ plugins {
     id("org.jetbrains.kotlin.android") version "1.8.10" apply false
     id("com.google.dagger.hilt.android") version "2.44" apply false
 }
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("app.cash.molecule:molecule-gradle-plugin:0.9.0")
+    }
+}
