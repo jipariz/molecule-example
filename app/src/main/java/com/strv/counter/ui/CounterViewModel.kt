@@ -22,7 +22,7 @@ class CounterViewModel @Inject constructor(
     private val moleculeEvents = MutableSharedFlow<CounterEvents>()
 
     val state: StateFlow<CounterState> = moleculeScope.launchMolecule(clock = RecompositionClock.ContextClock){
-        counterPresenter.Present(events = moleculeEvents)
+        counterPresenter.present(events = moleculeEvents)
     }
 
     fun onCounterButtonClicked() {

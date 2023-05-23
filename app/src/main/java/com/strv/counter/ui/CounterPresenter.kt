@@ -12,7 +12,7 @@ class CounterPresenter @Inject constructor(
     val counterDataStore: CounterDataStore
 ) {
     @Composable
-    fun Present(
+    fun present(
         events: Flow<CounterEvents>,
     ): CounterState {
         val currentCount by counterDataStore.state.collectAsState()
